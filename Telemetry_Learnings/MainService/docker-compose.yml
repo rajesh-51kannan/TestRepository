@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+
+  mainservice:
+    image: mainservice
+    build:
+      context: ../..
+      dockerfile: ./MainService/MainService/Dockerfile
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - RABBITMQ_HOSTNAME=rabbitmq
+        - RABBITMQ_DEFAULT_USER=guest
+        - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+        - 80:80
+    depends_on:      
+      - workerserviceprocessor
+      - workerservicehelper
+
+  workerservicehelper:
+    build:
+      context: ../..
+      dockerfile: ./MainService/WorkerServiceHelper/Dockerfile
+    image: workerservicehelper
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest      
+    restart: on-failure
+
+  workerserviceprocessor:
+    build:
+      context: ../..
+      dockerfile: ./MainService/WorkerServiceProcessor/Dockerfile
+    image: workerserviceprocessoor
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest      
+    restart: on-failure
