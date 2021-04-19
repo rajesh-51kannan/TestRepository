@@ -91,6 +91,13 @@ namespace MainService.Controllers
 
                var parentContext = Propagator.Extract(default, ea.BasicProperties, this.ExtractTraceContextFromBasicProperties);
                Baggage.Current = parentContext.Baggage;
+               var activityName = $"Worker_1_Queue_Out receive";
+               using var activity = ActivitySource.StartActivity(activityName, ActivityKind.Consumer, parentContext.ActivityContext);
+
+               activity?.SetTag("message", outputMessage);
+               Helper.AddMessagingTags(activity, "Worker_1_Queue_In");
+
+
            };
 
             Thread.Sleep(3000);
